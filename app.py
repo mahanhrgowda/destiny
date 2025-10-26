@@ -181,7 +181,8 @@ def get_zodiac_element(sign):
 
 def local_to_utc_approx(local_dt, lon):
     offset_hours = lon / 15.0
-    return local_dt - datetime.timedelta(hours=offset_hours)
+    utc_dt = local_dt - datetime.timedelta(hours=offset_hours)
+    return utc_dt.replace(tzinfo=datetime.timezone.utc)
 
 def degrees_to_sign(deg):
     sign_index = int(deg // 30)
