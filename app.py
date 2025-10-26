@@ -4,11 +4,6 @@ import math
 import random
 import pandas as pd
 import decimal
-import matplotlib.pyplot as plt
-import networkx as nx
-from matplotlib.patches import RegularPolygon, Circle
-from matplotlib import animation
-import io
 
 dec = decimal.Decimal
 
@@ -417,18 +412,12 @@ def draw_kabbalah_tree(ax, alpha=0.5):
     for _, start, end in paths:
         ax.plot([start[0], end[0]], [start[1], end[1]], color='white', alpha=alpha)
 
-def animate_platonic_solid(fig, ax, solid_type, color):
-    """Create an animation of a rotating Platonic solid representation."""
-    def update(frame):
-        ax.clear()
-        angle = frame * (2 * math.pi / 60)
-        draw_platonic_solid(ax, (0, 0), solid_type, size=0.5, color=color, alpha=0.8)
-        ax.set_xlim(-1, 1)
-        ax.set_ylim(-1, 1)
-        ax.axis('off')
-    
-    anim = animation.FuncAnimation(fig, update, frames=60, interval=50)
-    return anim
+def draw_merkabah(ax, center, size, color='blue', alpha=0.5):
+    """Draw a 2D representation of Merkabah (interlocking tetrahedrons as star)."""
+    # Upward triangle
+    ax.add_patch(RegularPolygon(center, numVertices=3, radius=size, color=color, alpha=alpha, orientation=0))
+    # Downward triangle
+    ax.add_patch(RegularPolygon(center, numVertices=3, radius=size, color=color, alpha=alpha, orientation=math.pi))
 
 def generate_crystal_grid(life_path, element, destiny, soul_urge, personality):
     fig, ax = plt.subplots(figsize=(8, 8))
@@ -442,6 +431,9 @@ def generate_crystal_grid(life_path, element, destiny, soul_urge, personality):
     
     # Add Kabbalah Tree of Life
     draw_kabbalah_tree(ax, alpha=0.3)
+    
+    # Add Merkabah
+    draw_merkabah(ax, (0, 0), 0.4, color=color, alpha=0.4)
     
     # Central crystal with dynamic shape based on personality
     central_sides = (personality % 5) + 3  # 3 to 7 sides
@@ -643,6 +635,10 @@ if st.button("Weave My Destiny 🕸️🧙‍♀️🔮✨"):
         anim.save(buf, format='gif', writer='pillow', fps=30)
         buf.seek(0)
         st.image(buf, use_column_width=True)
+    
+    # Kabbalah Tree Explanation
+    st.subheader("Kabbalah Tree of Life Explanation 📜🧙‍♂️")
+    st.write("The Tree of Life is a diagram used in Kabbalah, representing the structure of creation and the path to spiritual enlightenment. It consists of 10 Sephirot (spheres) connected by 22 paths, each corresponding to a Hebrew letter and Tarot card. The Sephirot are: Keter (Crown), Chokhmah (Wisdom), Binah (Understanding), Chesed (Kindness), Gevurah (Severity), Tiferet (Beauty), Netzach (Victory), Hod (Glory), Yesod (Foundation), and Malkuth (Kingdom). This tree maps the divine emanations from the infinite to the finite world. 🌳🔮✨")
 
 # Compatibility Checker
 with st.expander("Check Compatibility with Another Person 💑🔍🧙‍♀️"):
