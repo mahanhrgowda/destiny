@@ -317,183 +317,15 @@ def cast_i_ching():
     future_hex = I_CHING_HEXNUMS[r]
     return current_hex, changing_lines, future_hex
 
-# Advanced Crystal Grid with Sacred Geometry
-ELEMENT_CRYSTAL_COLORS = {
-    "Fire": "red",
-    "Earth": "green",
-    "Air": "yellow",
-    "Water": "blue",
-    "Unknown": "purple"
-}
-
-def draw_flower_of_life(ax, center, radius, num_circles=7, alpha=0.3):
-    """Draw a simple Flower of Life pattern with overlapping circles."""
-    ax.add_patch(Circle(center, radius, color='white', alpha=alpha, fill=False))
-    for i in range(6):
-        angle = i * (2 * math.pi / 6)
-        x = center[0] + radius * math.cos(angle)
-        y = center[1] + radius * math.sin(angle)
-        ax.add_patch(Circle((x, y), radius, color='white', alpha=alpha, fill=False))
-    # Add more layers if num_circles > 7
-    if num_circles > 7:
-        for layer in range(1, (num_circles - 1) // 6 + 1):
-            for i in range(6 * layer):
-                angle = i * (2 * math.pi / (6 * layer))
-                dist = radius * 2 * layer
-                x = center[0] + dist * math.cos(angle)
-                y = center[1] + dist * math.sin(angle)
-                ax.add_patch(Circle((x, y), radius, color='white', alpha=alpha * (1 / (layer + 1)), fill=False))
-
-def draw_metatrons_cube(ax, center, radius, alpha=0.5):
-    """Draw Metatron's Cube by connecting centers of Flower of Life circles."""
-    centers = [(center[0], center[1])]
-    # Inner ring
-    for i in range(6):
-        angle = i * math.pi / 3
-        x = center[0] + radius * math.cos(angle)
-        y = center[1] + radius * math.sin(angle)
-        centers.append((x, y))
-    # Outer ring, rotated
-    for i in range(6):
-        angle = i * math.pi / 3 + math.pi / 6
-        x = center[0] + radius * 2 * math.cos(angle)
-        y = center[1] + radius * 2 * math.sin(angle)
-        centers.append((x, y))
-    
-    # Draw lines between centers that are 2*radius apart
-    for i in range(len(centers)):
-        for j in range(i+1, len(centers)):
-            dx = centers[i][0] - centers[j][0]
-            dy = centers[i][1] - centers[j][1]
-            dist = math.sqrt(dx**2 + dy**2)
-            if abs(dist - 2 * radius) < 0.01 or abs(dist - radius * math.sqrt(3)) < 0.01 or abs(dist - radius) < 0.01:
-                ax.plot([centers[i][0], centers[j][0]], [centers[i][1], centers[j][1]], color='gold', alpha=alpha, linewidth=1.5)
-
-def draw_platonic_solid(ax, center, solid_type, size=0.2, color='blue', alpha=0.5):
-    """Draw a simple 2D representation of a Platonic solid."""
-    if solid_type == "tetrahedron":
-        # Triangle for tetrahedron projection
-        ax.add_patch(RegularPolygon(center, numVertices=3, radius=size, color=color, alpha=alpha))
-    elif solid_type == "cube":
-        # Square for cube
-        ax.add_patch(RegularPolygon(center, numVertices=4, radius=size, color=color, alpha=alpha))
-    elif solid_type == "octahedron":
-        # Diamond shape
-        ax.add_patch(RegularPolygon(center, numVertices=4, radius=size, color=color, alpha=alpha, orientation=math.pi/4))
-    elif solid_type == "dodecahedron":
-        # Pentagon
-        ax.add_patch(RegularPolygon(center, numVertices=5, radius=size, color=color, alpha=alpha))
-    elif solid_type == "icosahedron":
-        # Triangle with lines
-        ax.add_patch(RegularPolygon(center, numVertices=3, radius=size, color=color, alpha=alpha))
-        ax.plot([center[0]-size/2, center[0]+size/2], [center[1]-size/4, center[1]-size/4], color=color, alpha=alpha)
-
-def draw_kabbalah_tree(ax, alpha=0.5):
-    """Draw a simple representation of the Kabbalah Tree of Life."""
-    sephirot = [
-        (0, 4.5, "Keter"), ( -1, 3.5, "Chokhmah"), (1, 3.5, "Binah"),
-        (-1, 2, "Chesed"), (1, 2, "Gevurah"),
-        (0, 1, "Tiferet"),
-        (-1, 0, "Netzach"), (1, 0, "Hod"),
-        (0, -1, "Yesod"),
-        (0, -2, "Malkuth")
-    ]
-    for x, y, label in sephirot:
-        ax.add_patch(Circle((x, y), 0.2, color='white', alpha=alpha))
-        ax.text(x, y, label, fontsize=8, ha='center', va='center', color='black')
-    
-    paths = [
-        (0, (0,4.5), (-1,3.5)), (1, (0,4.5), (1,3.5)),
-        (2, (-1,3.5), (1,3.5)), (3, (-1,3.5), (-1,2)), (4, (1,3.5), (1,2)),
-        (5, (-1,2), (1,2)), (6, (-1,2), (0,1)), (7, (1,2), (0,1)),
-        (8, (0,1), (-1,0)), (9, (0,1), (1,0)), (10, (-1,0), (1,0)),
-        (11, (-1,0), (0,-1)), (12, (1,0), (0,-1)), (13, (0,-1), (0,-2))
-    ]
-    for _, start, end in paths:
-        ax.plot([start[0], end[0]], [start[1], end[1]], color='white', alpha=alpha)
-
-def draw_merkabah(ax, center, size, color='blue', alpha=0.5):
-    """Draw a 2D representation of Merkabah (interlocking tetrahedrons as star)."""
-    # Upward triangle
-    ax.add_patch(RegularPolygon(center, numVertices=3, radius=size, color=color, alpha=alpha, orientation=0))
-    # Downward triangle
-    ax.add_patch(RegularPolygon(center, numVertices=3, radius=size, color=color, alpha=alpha, orientation=math.pi))
-
-def generate_crystal_grid(life_path, element, destiny, soul_urge, personality):
-    fig, ax = plt.subplots(figsize=(8, 8))
-    color = ELEMENT_CRYSTAL_COLORS.get(element, "purple")
-    
-    # Add Sacred Geometry: Flower of Life background
-    draw_flower_of_life(ax, (0, 0), 0.5, num_circles=life_path + destiny % 10)
-    
-    # Add Metatron's Cube
-    draw_metatrons_cube(ax, (0, 0), 0.5)
-    
-    # Add Kabbalah Tree of Life
-    draw_kabbalah_tree(ax, alpha=0.3)
-    
-    # Add Merkabah
-    draw_merkabah(ax, (0, 0), 0.4, color=color, alpha=0.4)
-    
-    # Central crystal with dynamic shape based on personality
-    central_sides = (personality % 5) + 3  # 3 to 7 sides
-    ax.add_patch(RegularPolygon((0, 0), numVertices=central_sides, radius=0.3, color=color, alpha=0.8, orientation=math.pi / central_sides))
-    
-    # Dynamic layers based on soul_urge and destiny, with varying rotations
-    layers = min((life_path + soul_urge + personality) % 5 + 1, 5)  # Up to 5 layers for more dynamism
-    rotation_offset = math.pi / (destiny or 1)  # Dynamic rotation based on destiny
-    for layer in range(1, layers + 1):
-        num_crystals = (destiny + soul_urge + layer) % (8 * layer) + 5 * layer  # Increased variability
-        for i in range(num_crystals):
-            angle = 2 * math.pi * i / num_crystals + (layer * rotation_offset)
-            x = layer * 0.8 * math.cos(angle)
-            y = layer * 0.8 * math.sin(angle)
-            shape_sides = ((layer + personality) % 5) + 3  # Vary shape per layer
-            ax.add_patch(RegularPolygon((x, y), numVertices=shape_sides, radius=0.15 / layer, color=color, alpha=0.7 - 0.1 * layer, orientation=angle))
-    
-    # Enhanced connections with NetworkX for dynamic graph, adding more cross-links
-    G = nx.Graph()
-    positions = {(0,0): (0,0)}
-    for layer in range(1, layers + 1):
-        num_crystals = (destiny + soul_urge + layer) % (8 * layer) + 5 * layer
-        for i in range(num_crystals):
-            angle = 2 * math.pi * i / num_crystals + (layer * rotation_offset)
-            x = layer * 0.8 * math.cos(angle)
-            y = layer * 0.8 * math.sin(angle)
-            positions[(layer, i)] = (x, y)
-            # Connect to center
-            G.add_edge((0,0), (layer, i))
-            # Connect to previous layer dynamically
-            if layer > 1:
-                prev_num = (destiny + soul_urge + layer - 1) % (8 * (layer-1)) + 5 * (layer-1)
-                prev_i = i % prev_num
-                G.add_edge((layer-1, prev_i), (layer, i))
-            # Circumferential connections
-            if i > 0:
-                G.add_edge((layer, i-1), (layer, i))
-            G.add_edge((layer, (i + 1) % num_crystals), (layer, i))  # Close the ring
-            # Add spiral connections for dynamism
-            if i % 3 == 0 and layer > 2:
-                spiral_i = (i // 3) % (prev_num // 2 + 1)
-                G.add_edge((layer, i), (layer-2, spiral_i))
-    
-    nx.draw_networkx_edges(G, positions, ax=ax, edge_color='gold', alpha=0.4, style='dotted', width=1.5)
-    
-    # Add Platonic Solids at outer positions
-    platonic_solids = ["tetrahedron", "cube", "octahedron", "dodecahedron", "icosahedron"]
-    for i, solid in enumerate(platonic_solids):
-        angle = i * (2 * math.pi / 5)
-        x = 3 * math.cos(angle)
-        y = 3 * math.sin(angle)
-        draw_platonic_solid(ax, (x, y), solid, size=0.2, color=color, alpha=0.6)
-    
-    ax.set_aspect('equal')
-    ax.axis('off')
-    ax.set_title(f"Dynamic Sacred Crystal Grid for Life Path {life_path} ({element})", color='white')
-    fig.patch.set_facecolor('black')
-    ax.set_facecolor('black')
-    
-    return fig
+# Crystal Grid Visualization (text-based placeholder)
+def generate_crystal_grid_text(life_path, element, destiny, soul_urge, personality):
+    return f"""
+    Crystal Grid Description:
+    - Central Node: Life Path {life_path} ({element})
+    - Layers: {min((life_path + soul_urge + personality) % 5 + 1, 5)}
+    - Sacred Elements: Flower of Life, Metatron's Cube, Platonic Solids, Kabbalah Tree, Merkabah
+    Imagine a glowing grid with interconnected nodes representing your cosmic energy! 💎🌀✨
+    """
 
 # Main App
 st.title("Occult Destiny Weaver: Enhanced Numerology & Astrology Edition 🧙‍♂️🔮✨🌙")
@@ -617,24 +449,17 @@ if st.button("Weave My Destiny 🕸️🧙‍♀️🔮✨"):
             st.write("No changing lines. 🔒")
         st.write(f"Future Hexagram: {future_hex} 🌟")
     
-    # Crystal Grid Visualization
+    # Crystal Grid Visualization (text-based)
     st.subheader("Advanced Crystal Grid Visualization 💎🌀🧙‍♂️")
     st.write("An enhanced mystical crystal grid with layered patterns and sacred geometry (Flower of Life, Metatron's Cube, Platonic Solids) based on your Life Path, Destiny, Soul Urge, Personality, and Element, channeling cosmic energies. 🔮✨")
-    fig = generate_crystal_grid(life_path, element, destiny, soul_urge, personality)
-    st.pyplot(fig)
+    grid_text = generate_crystal_grid_text(life_path, element, destiny, soul_urge, personality)
+    st.text(grid_text)
     
-    # Animated Platonic Solid
+    # Animated Platonic Solid (text-based placeholder)
     st.subheader("Animated Platonic Solid Visualization 🧊🔄🧙‍♀️")
     solid_type = st.selectbox("Choose a Platonic Solid to Animate", ["tetrahedron", "cube", "octahedron", "dodecahedron", "icosahedron"])
     if st.button("Animate Solid 🪄"):
-        anim_fig, anim_ax = plt.subplots(figsize=(6, 6))
-        anim_fig.patch.set_facecolor('black')
-        anim_ax.set_facecolor('black')
-        anim = animate_platonic_solid(anim_fig, anim_ax, solid_type, color=ELEMENT_CRYSTAL_COLORS.get(element, "purple"))
-        buf = io.BytesIO()
-        anim.save(buf, format='gif', writer='pillow', fps=30)
-        buf.seek(0)
-        st.image(buf, use_column_width=True)
+        st.write(f"Imagine a rotating {solid_type} in {ELEMENT_CRYSTAL_COLORS.get(element, 'mystical colors')}! 🧊🔄✨")
     
     # Kabbalah Tree Explanation
     st.subheader("Kabbalah Tree of Life Explanation 📜🧙‍♂️")
