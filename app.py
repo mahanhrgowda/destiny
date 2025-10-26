@@ -128,6 +128,13 @@ tarot_cards = [
 
 DAY_ZERO = datetime.datetime(2000, 1, 1, 12, tzinfo=datetime.timezone.utc)
 
+ELEMENT_CRYSTAL_COLORS = {
+    "Fire": "fiery reds and oranges",
+    "Earth": "earthy greens and browns",
+    "Air": "airy blues and whites",
+    "Water": "watery blues and greens"
+}
+
 # Numerology Functions
 def reduce_number(num):
     while num > 9 and num not in [11, 22, 33]:
@@ -408,13 +415,26 @@ if st.button("Weave My Destiny 🕸️🧙‍♀️🔮✨"):
     })
     st.map(sites_df)
     
+    # Initialize session states
+    if 'prediction' not in st.session_state:
+        st.session_state.prediction = generate_prediction(life_path, zodiac, element, moon_phase_name, asc_sign, mc_sign)
+    if 'tarot' not in st.session_state:
+        st.session_state.tarot = None
+    if 'runes' not in st.session_state:
+        st.session_state.runes = None
+    if 'i_ching' not in st.session_state:
+        st.session_state.i_ching = None
+    if 'animated_solid' not in st.session_state:
+        st.session_state.animated_solid = None
+
     # Fate Spinner
-    prediction = generate_prediction(life_path, zodiac, element, moon_phase_name, asc_sign, mc_sign)
-    st.subheader("Fate Spinner Prediction 🎡🔮🧙‍♂️")
-    st.write(prediction)
-    if st.button("Spin Again 🔄🪄"):
-        prediction = generate_prediction(life_path, zodiac, element, moon_phase_name, asc_sign, mc_sign)
-        st.write(prediction)
+    @st.fragment
+    def fate_spinner():
+        st.subheader("Fate Spinner Prediction 🎡🔮🧙‍♂️")
+        st.write(st.session_state.prediction)
+        if st.button("Spin Again 🔄🪄"):
+            st.session_state.prediction = generate_prediction(life_path, zodiac, element, moon_phase_name, asc_sign, mc_sign)
+    fate_spinner()
     
     # Spell Card
     incantation = generate_incantation(name, zodiac, moon_phase_name, asc_sign, mc_sign)
@@ -427,28 +447,41 @@ if st.button("Weave My Destiny 🕸️🧙‍♀️🔮✨"):
     st.write(horoscope)
     
     # Tarot Draw
-    st.subheader("Tarot Insight 🃏✨🔮")
-    if st.button("Draw a Tarot Card 🪄🧙‍♂️"):
-        tarot = draw_tarot(zodiac)
-        st.write(tarot)
+    @st.fragment
+    def tarot_section():
+        st.subheader("Tarot Insight 🃏✨🔮")
+        if st.button("Draw a Tarot Card 🪄🧙‍♂️"):
+            st.session_state.tarot = draw_tarot(zodiac)
+        if st.session_state.tarot:
+            st.write(st.session_state.tarot)
+    tarot_section()
     
     # Rune Casting
-    st.subheader("Rune Casting ᚠᚢᚦᚨᚱᚲ🧙‍♂️🔮")
-    if st.button("Cast Runes 🪄✨"):
-        runes = cast_runes()
-        for rune in runes:
-            st.write(rune)
+    @st.fragment
+    def rune_section():
+        st.subheader("Rune Casting ᚠᚢᚦᚨᚱᚲ🧙‍♂️🔮")
+        if st.button("Cast Runes 🪄✨"):
+            st.session_state.runes = cast_runes()
+        if st.session_state.runes:
+            for rune in st.session_state.runes:
+                st.write(rune)
+    rune_section()
     
     # I Ching Divination
-    st.subheader("I Ching Divination 📖🧙‍♀️🔮")
-    if st.button("Cast I Ching 🪄🌌"):
-        current_hex, changing_lines, future_hex = cast_i_ching()
-        st.write(f"Current Hexagram: {current_hex} 📜")
-        if changing_lines:
-            st.write("Changing Lines: " + ", ".join(changing_lines) + " 🔄")
-        else:
-            st.write("No changing lines. 🔒")
-        st.write(f"Future Hexagram: {future_hex} 🌟")
+    @st.fragment
+    def i_ching_section():
+        st.subheader("I Ching Divination 📖🧙‍♀️🔮")
+        if st.button("Cast I Ching 🪄🌌"):
+            st.session_state.i_ching = cast_i_ching()
+        if st.session_state.i_ching:
+            current_hex, changing_lines, future_hex = st.session_state.i_ching
+            st.write(f"Current Hexagram: {current_hex} 📜")
+            if changing_lines:
+                st.write("Changing Lines: " + ", ".join(changing_lines) + " 🔄")
+            else:
+                st.write("No changing lines. 🔒")
+            st.write(f"Future Hexagram: {future_hex} 🌟")
+    i_ching_section()
     
     # Crystal Grid Visualization (text-based)
     st.subheader("Advanced Crystal Grid Visualization 💎🌀🧙‍♂️")
@@ -457,37 +490,48 @@ if st.button("Weave My Destiny 🕸️🧙‍♀️🔮✨"):
     st.text(grid_text)
     
     # Animated Platonic Solid (text-based placeholder)
-    st.subheader("Animated Platonic Solid Visualization 🧊🔄🧙‍♀️")
-    solid_type = st.selectbox("Choose a Platonic Solid to Animate", ["tetrahedron", "cube", "octahedron", "dodecahedron", "icosahedron"])
-    if st.button("Animate Solid 🪄"):
-        st.write(f"Imagine a rotating {solid_type} in {ELEMENT_CRYSTAL_COLORS.get(element, 'mystical colors')}! 🧊🔄✨")
+    @st.fragment
+    def animate_section():
+        st.subheader("Animated Platonic Solid Visualization 🧊🔄🧙‍♀️")
+        solid_type = st.selectbox("Choose a Platonic Solid to Animate", ["tetrahedron", "cube", "octahedron", "dodecahedron", "icosahedron"])
+        if st.button("Animate Solid 🪄"):
+            st.session_state.animated_solid = f"Imagine a rotating {solid_type} in {ELEMENT_CRYSTAL_COLORS.get(element, 'mystical colors')}! 🧊🔄✨"
+        if st.session_state.animated_solid:
+            st.write(st.session_state.animated_solid)
+    animate_section()
     
     # Kabbalah Tree Explanation
     st.subheader("Kabbalah Tree of Life Explanation 📜🧙‍♂️")
     st.write("The Tree of Life is a diagram used in Kabbalah, representing the structure of creation and the path to spiritual enlightenment. It consists of 10 Sephirot (spheres) connected by 22 paths, each corresponding to a Hebrew letter and Tarot card. The Sephirot are: Keter (Crown), Chokhmah (Wisdom), Binah (Understanding), Chesed (Kindness), Gevurah (Severity), Tiferet (Beauty), Netzach (Victory), Hod (Glory), Yesod (Foundation), and Malkuth (Kingdom). This tree maps the divine emanations from the infinite to the finite world. 🌳🔮✨")
 
 # Compatibility Checker
-with st.expander("Check Compatibility with Another Person 💑🔍🧙‍♀️"):
-    name2 = st.text_input("Enter second person's full name 📝🪄")
-    birth_date2 = st.date_input("Enter second person's birth date 📅🔮", min_value=datetime.date(1900, 1, 1), max_value=datetime.date(2100, 12, 31))
-    birth_city2 = st.selectbox("Select second person's birth city 🏰🌍", list(CITY_COORDS.keys()) + ["Custom"])
-    if birth_city2 == "Custom":
-        user_lat2 = st.number_input("Enter second latitude 🌐🧙‍♂️", -90.0, 90.0)
-        user_lon2 = st.number_input("Enter second longitude 🌐🔮", -180.0, 180.0)
-    else:
-        user_lat2, user_lon2 = CITY_COORDS.get(birth_city2, (0, 0))
-    
-    if st.button("Calculate Compatibility 📊❤️🪄") and name and name2:
-        life_path2, _ = calculate_life_path(birth_date2)
-        zodiac2 = get_zodiac_sign(birth_date2.month, birth_date2.day)
-        element2 = get_zodiac_element(zodiac2)
-        compat_score = calculate_compatibility(life_path, element, life_path2, element2)
-        st.write(f"Compatibility Score: {compat_score}% 📈✨")
-        st.write(f"Your {zodiac} ({element}) and their {zodiac2} ({element2}) create a unique synergy. ⚡🤝🧙‍♂️")
+@st.fragment
+def compatibility_section():
+    with st.expander("Check Compatibility with Another Person 💑🔍🧙‍♀️"):
+        name2 = st.text_input("Enter second person's full name 📝🪄")
+        birth_date2 = st.date_input("Enter second person's birth date 📅🔮", min_value=datetime.date(1900, 1, 1), max_value=datetime.date(2100, 12, 31))
+        birth_city2 = st.selectbox("Select second person's birth city 🏰🌍", list(CITY_COORDS.keys()) + ["Custom"])
+        if birth_city2 == "Custom":
+            user_lat2 = st.number_input("Enter second latitude 🌐🧙‍♂️", -90.0, 90.0)
+            user_lon2 = st.number_input("Enter second longitude 🌐🔮", -180.0, 180.0)
+        else:
+            user_lat2, user_lon2 = CITY_COORDS.get(birth_city2, (0, 0))
+        
+        if st.button("Calculate Compatibility 📊❤️🪄") and name and name2:
+            life_path2, _ = calculate_life_path(birth_date2)
+            zodiac2 = get_zodiac_sign(birth_date2.month, birth_date2.day)
+            element2 = get_zodiac_element(zodiac2)
+            compat_score = calculate_compatibility(life_path, element, life_path2, element2)
+            st.write(f"Compatibility Score: {compat_score}% 📈✨")
+            st.write(f"Your {zodiac} ({element}) and their {zodiac2} ({element2}) create a unique synergy. ⚡🤝🧙‍♂️")
+compatibility_section()
 
 # Future Prediction Slider
-st.subheader("Future Destiny Peek 🔮⏳🧙‍♀️")
-future_year = st.slider("Select a future year 📅🪄", birth_date.year + 1, birth_date.year + 50)
-future_date = datetime.date(future_year, birth_date.month, birth_date.day)
-future_lp, _ = calculate_life_path(future_date)
-st.write(f"In {future_year}, your vibrational energy shifts to Life Path influence {future_lp}. 🌌✨🔮")
+@st.fragment
+def future_section():
+    st.subheader("Future Destiny Peek 🔮⏳🧙‍♀️")
+    future_year = st.slider("Select a future year 📅🪄", birth_date.year + 1, birth_date.year + 50)
+    future_date = datetime.date(future_year, birth_date.month, birth_date.day)
+    future_lp, _ = calculate_life_path(future_date)
+    st.write(f"In {future_year}, your vibrational energy shifts to Life Path influence {future_lp}. 🌌✨🔮")
+future_section()
