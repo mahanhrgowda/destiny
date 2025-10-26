@@ -34,17 +34,7 @@ MYSTICAL_SITES = {
     "Great Pyramid": (29.9792, 31.1342),
     "Uluru": (-25.3444, 131.0369),
     "Sedona Vortex": (34.8697, -111.7610),
-    # Vedic and Puranic references
-    "Mount Kailash": (31.0669, 81.3125),  # Abode of Shiva
-    "Varanasi": (25.3176, 82.9739),  # Sacred city on Ganges
-    "Kurukshetra": (29.9657, 76.8370),  # Battlefield of Mahabharata
-    "Dwarka": (22.2442, 68.9686),  # Krishna's city
-    "Ayodhya": (26.7929, 82.1999),  # Birthplace of Rama
-    "Mathura": (27.4924, 77.6737),  # Birthplace of Krishna
-    "Haridwar": (29.9457, 78.1642),  # Gateway to Gods
-    "Ujjain": (23.1765, 75.7849),  # Mahakaleshwar Jyotirlinga
-    "Rameswaram": (9.2876, 79.3129),  # Rama's bridge site
-    "Kanchipuram": (12.8392, 79.7042)  # One of Sapta Puri
+    "Dwarka": (22.2442, 68.9686),  # Verified leyline site in India
 }
 
 CITY_COORDS = {
